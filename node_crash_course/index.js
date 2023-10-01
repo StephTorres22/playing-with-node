@@ -17,6 +17,14 @@ const http = require("http");
 const path = require("path");
 const fs = require("fs");
 
+const contentTypeMap = new Map();
+
+contentTypeMap.set(".js", "text/Javascript");
+contentTypeMap.set(".css", "text/css");
+contentTypeMap.set(".json", "application/json");
+contentTypeMap.set("png", "image/png");
+contentTypeMap.set(".jpg", "image/jpg");
+
 const PORT = process.env.PORT || 5000;
 
 const server = http.createServer((req, res) => {
@@ -56,11 +64,16 @@ const server = http.createServer((req, res) => {
   //Get extension of file so we can set content-type header
   let extName = path.extname(filePath);
 
+  function setContentTpye() {
+    if (contentTypeMap.has(extName)) {
+      return contentTypeMap.get(extName);
+    } else return contentType;
+  }
   //set initial content type
   let contentType = "text/html";
 
   //check ext and set content type
-  switch (extName) {
+  /*   switch (extName) {
     case ".js":
       contentType = "text/javascript";
       break;
@@ -76,7 +89,7 @@ const server = http.createServer((req, res) => {
     case ".jpg":
       contentType = "image/jpg";
       break;
-  }
+  } */
   //surely a map would be a better way! loop through map, if extName is equal to map key, contentType = to value.
 
   //Read file
@@ -97,7 +110,7 @@ const server = http.createServer((req, res) => {
       }
     } else {
       //success
-      res.writeHead(200, { "Content-Type": contentType });
+      res.writeHead(200, { "Content-Type": setContentTpye() });
       res.end(content, "utf8");
     }
   });
